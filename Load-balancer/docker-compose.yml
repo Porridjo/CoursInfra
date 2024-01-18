@@ -1,0 +1,23 @@
+#TODO
+version: '3.8'
+services:
+  app1:
+    build:
+      context: .
+    environment:
+      - NODE_ENV="test_app1"
+  app2:
+    build:
+      context: .
+    environment:
+      - NODE_ENV="test_app2"
+  app3:
+    build:
+      context: .
+    environment:
+      - NODE_ENV="test_app3"
+  load-balancer:
+    build:
+      context: load-balancer/.
+    ports:
+      - '9000:80'

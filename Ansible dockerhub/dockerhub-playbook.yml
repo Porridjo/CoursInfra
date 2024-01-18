@@ -1,0 +1,57 @@
+---
+- name: "Dockerhub syllabusHTML"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    docker_image_to_deploy: olivierchoquet/syllabushtml:alpine
+    container_name: syllabushtml_alpine
+  tasks: 
+    - name: "Installer prérequis Docker"
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+    
+    - name: "Ajouter clé GPG du dépôt docker"
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: "Ajout le dépôt docker au sources.list"
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian buster stable
+        state: present
+    
+    - name: "Installer docker"
+      apt:
+        name:
+          - docker-ce
+        state: latest
+    
+    - name: "Installer pip"
+      apt:
+        name:
+          - python3-pip
+    
+    - name: "Supprimer env virtuel"
+      command: rm /usr/lib/python3.11/EXTERNALLY-MANAGED
+
+    - name: "Installer module docker python"
+      pip:
+        name: docker
+
+    - name: "Pull docker image"
+      docker_image:
+        source: pull
+        name: "{{ docker_image_to_deploy }}"
+
+    - name: "Exécuter container"
+      docker_container:
+        container_default_behavior: no_defaults
+        name: container{{ container_name }}
+        image: "{{ docker_image_to_deploy }}"
+        ports:
+          - "8080:80"

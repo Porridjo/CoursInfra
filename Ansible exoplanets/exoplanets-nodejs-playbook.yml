@@ -1,0 +1,40 @@
+- name: "Install Exoplanets(nodejs) site"
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: "Install nodejs npm"
+      apt:
+        update_cache: yes
+        name:
+          - nodejs
+          - npm
+        state: present
+    
+    - name: "git clone public repo"
+      ansible.builtin.git:
+        repo: https://gitlab.vinci.be/olivier.choquet/exoplanets_infra.git
+        dest: /home/rayure/ansible/exoplanets_site
+
+    - name: "Build app"
+      command: npm install
+      args:
+        chdir: /home/rayure/ansible/exoplanets_site
+
+    # - name: "Run app"
+    #   command: npm start
+    #   args:
+    #     chdir: /home/rayure/ansible/exoplanets_site
+
+    - name: "Install PM2"
+      npm: 
+        name: pm2
+        global: true
+      
+    - name: "Start App"
+      command: pm2 start npm -- start
+      args:
+        chdir: /home/rayure/ansible/exoplanets_site
+
+        
+      
+        
